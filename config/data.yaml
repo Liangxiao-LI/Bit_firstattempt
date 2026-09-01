@@ -1,0 +1,95 @@
+# Data Configuration Schema
+
+klines:
+  symbol: "BTCUSDT"
+  interval: "1m"
+  fields:
+    - timestamp
+    - open
+    - high
+    - low
+    - close
+    - volume
+    - quote_volume
+    - trade_count
+    - taker_buy_base_volume
+    - taker_buy_quote_volume
+  storage_format: "parquet"
+  partition_by: "month"
+
+funding_rate:
+  symbol: "BTCUSDT"
+  fields:
+    - timestamp
+    - symbol
+    - funding_rate
+    - mark_price
+  storage_format: "parquet"
+  frequency: "8-hourly"
+  alignment: "forward_fill_after_timestamp"
+
+open_interest:
+  symbol: "BTCUSDT"
+  fields:
+    - timestamp
+    - symbol
+    - open_interest
+    - open_interest_value
+  storage_format: "parquet"
+  frequency: "hourly"
+  alignment: "forward_fill_after_timestamp"
+
+# Canonical research dataset schema
+canonical_dataset:
+  index: "timestamp"
+  index_type: "datetime64[ns, UTC]"
+  fields:
+    # Price data
+    - open
+    - high
+    - low
+    - close
+    - volume
+    - quote_volume
+    - trade_count
+    - taker_buy_volume
+    
+    # On-chain sentiment
+    - funding_rate
+    - open_interest
+  
+  # Features computed from base fields
+  derived_features:
+    returns:
+      - return_1m
+      - return_5m
+      - return_15m
+      - return_30m
+      - return_1h
+    
+    volatility:
+      - realized_vol_5m
+      - realized_vol_30m
+      - realized_vol_1h
+    
+    volume:
+      - volume_zscore
+      - volume_change
+      - taker_buy_ratio
+    
+    funding:
+      - funding_zscore
+      - funding_change
+    
+    open_interest:
+      - oi_change
+      - oi_pct_change
+      - oi_zscore
+
+# Validation rules
+validation:
+  check_missing_data: true
+  check_duplicate_timestamps: true
+  check_timestamp_gaps: true
+  check_price_bounds: true
+  check_volume_bounds: true

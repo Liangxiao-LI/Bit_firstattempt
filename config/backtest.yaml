@@ -1,0 +1,75 @@
+# Backtest Configuration
+
+backtest:
+  # Core settings
+  symbol: "BTCUSDT"
+  start_date: "2022-01-01"
+  end_date: "2026-08-31"
+  initial_capital: 100000
+  
+  # Position sizing
+  position_sizing: "fixed"  # fixed, kelly, volatility_scaled
+  max_position: 1.0  # -1.0 to 1.0
+  
+  # Execution
+  execution_type: "bar_based"  # bar_based, tick_based
+  execution_price: "close"  # close, next_open, vwap
+  
+  # Trading costs
+  costs:
+    fees:
+      maker_bps: 2
+      taker_bps: 5
+    
+    slippage:
+      default_bps: 2
+      per_side: false
+  
+  # Leverage
+  leverage:
+    enabled: false
+    max_leverage: 1.0
+    maintenance_margin_pct: 0.05
+    initial_margin_pct: 0.10
+  
+  # Funding (for perpetuals)
+  funding:
+    enabled: true
+    include_in_pnl: true
+  
+  # Risk management
+  risk:
+    max_drawdown: 0.30
+    stop_loss_pct: null
+    take_profit_pct: null
+
+# Performance metrics to compute
+metrics:
+  required:
+    - total_return
+    - annualized_return
+    - annualized_volatility
+    - sharpe_ratio
+    - sortino_ratio
+    - max_drawdown
+    - calmar_ratio
+    - win_rate
+    - profit_factor
+    - turnover
+    - average_trade_return
+    - num_trades
+    
+  optional:
+    - long_exposure
+    - short_exposure
+    - rolling_sharpe
+    - rolling_volatility
+    - monthly_returns
+
+# Output configuration
+output:
+  format: "csv"
+  save_equity_curve: true
+  save_drawdown_curve: true
+  save_trade_log: true
+  save_monthly_returns: true
