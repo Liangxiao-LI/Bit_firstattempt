@@ -89,6 +89,122 @@ python scripts/run_backtest.py
 Binance API → Raw Data → Validation → Normalization → Alignment → Features → Signals → Backtest → Metrics
 ```
 
+### System Architecture Diagram
+
+```mermaid
+graph TD
+    A["Binance API<br/>(Exchange)"] -->|Klines| B["Raw Data<br/>Downloader"]
+    A -->|Funding Rate| B
+    A -->|Open Interest| B
+    
+    B -->|Immutable| C["Raw Storage<br/>(data/raw/)"]
+    C -->|Load| D["Data Validation<br/>& Normalization"]
+    
+    D -->|Check Quality| E["Validation Engine"]
+    E -->|Pass| F["Canonical Dataset<br/>(Aligned by Timestamp)"]
+    E -->|Fail| G["Error Logging"]
+    
+    F -->|Price Data| H["Feature Pipeline"]
+    F -->|Volume Data| H
+    F -->|Funding/OI| H
+    
+    H -->|Returns| I["Returns Module"]
+    H -->|Volatility| J["Volatility Module"]
+    H -->|Volume| K["Volume Module"]
+    H -->|Funding| L["Funding Module"]
+    H -->|OI| M["OI Module"]
+    
+    I -->|Computed Features| N["Feature Storage<br/>(data/features/)"]
+    J -->|Computed Features| N
+    K -->|Computed Features| N
+    L -->|Computed Features| N
+    M -->|Computed Features| N
+    
+    N -->|Load Features| O["Signal Generator"]
+    O -->|Momentum| P["Momentum Signal"]
+    O -->|Mean Reversion| Q["Mean Reversion Signal"]
+    O -->|Composite| R["Composite Signal"]
+    
+    P -->|Position Signal| S["Backtest Engine"]
+    Q -->|Position Signal| S
+    R -->|Position Signal| S
+    
+    F -->|Price/Volume| S
+    
+    S -->|Execute| T["Execution Module"]
+    T -->|Calc Costs| U["Cost Model<br/>Fees + Slippage"]
+    U -->|Apply| V["Portfolio Tracker"]
+    
+    V -->|Equity Curve| W["Metrics Calculator"]
+    W -->|Sharpe, Sortino| X["Performance Metrics"]
+    
+    V -->|Results| Y["Output Storage<br/>(outputs/)"]
+    X -->|Metrics| Y
+    
+    Y -->|Analyze| Z["Research<br/>Diagnostics"]
+    Z -->|IC, Correlation| AA["Research Insights"]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#fff3e0
+    style F fill:#f3e5f5
+    style H fill:#e8f5e9
+    style N fill:#f3e5f5
+    style O fill:#fce4ec
+    style S fill:#ffe0b2
+    style W fill:#c8e6c9
+    style Y fill:#b3e5fc
+    style Z fill:#d1c4e9
+```
+
+### Module Interaction Flow
+
+```mermaid
+graph LR
+    subgraph Data["📊 Data Layer"]
+        D1["Binance Client"]
+        D2["Validation"]
+        D3["Storage"]
+    end
+    
+    subgraph Features["🔧 Feature Layer"]
+        F1["Returns"]
+        F2["Volatility"]
+        F3["Volume"]
+        F4["Funding"]
+        F5["OI"]
+    end
+    
+    subgraph Signals["⚡ Signal Layer"]
+        S1["Momentum"]
+        S2["Mean Reversion"]
+        S3["Composite"]
+    end
+    
+    subgraph Backtest["📈 Backtest Layer"]
+        B1["Engine"]
+        B2["Execution"]
+        B3["Costs"]
+    end
+    
+    subgraph Research["🔬 Research Layer"]
+        R1["IC Analysis"]
+        R2["Correlations"]
+        R3["Diagnostics"]
+    end
+    
+    Data -->|Canonical Data| Features
+    Features -->|Feature Matrix| Signals
+    Signals -->|Position Signal| Backtest
+    Backtest -->|Equity Curve| Research
+    
+    style Data fill:#e1f5ff
+    style Features fill:#e8f5e9
+    style Signals fill:#fce4ec
+    style Backtest fill:#ffe0b2
+    style Research fill:#d1c4e9
+```
+
 ### Key Components
 
 #### Data Module (`crypto_quant/data/`)
