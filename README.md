@@ -48,10 +48,10 @@ crypto-quant/
 ### 1. Setup Environment
 
 ```bash
-cd crypto-quant
+cd Bit_firstattempt              # Navigate to project root directory
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -e .
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+pip install -e .                # Install from project root (where pyproject.toml is)
 ```
 
 ### 2. Configure API Keys
